@@ -3,7 +3,8 @@
 #define     TXD                   BIT2                      // TXD on P1.2
 #define     RXD                   BIT1                      // RXD on P1.1
 
-#define		SPIN1						 BIT4
+#define		  SPIN1						      BIT4
+#define     SPIN2                 BIT5
 
 unsigned int TXByte;
 int cycleVal;
@@ -15,6 +16,7 @@ void main(void)
   ADC10CTL0 = ADC10SHT_2 + ADC10ON; 	    // ADC10ON
   ADC10CTL1 = INCH_4;                       // input A4
   ADC10AE0 |= SPIN1;                         // PA.4 ADC option select
+  ADC10AE0 |= SPIN2;
   P1DIR |= 0x01 ;                            // Set P1.0 to output direction
   
   P1DIR |= TXD;
@@ -40,12 +42,11 @@ void main(void)
       P1OUT |= 0x01;                        // Set P1.0 LED on
     
     cycleVal = (unsigned char)(ADC10MEM>>2) % 51;
-    if (cycleVal - prevCycleVal < -35) { // if it goes from 50 to 0, counter-clockwise
-      TXByte = 1;
-    } else if (cycleVal - prevCycleVal > 35) { // if it goes from 0 to 50, clock-wise
-      TXByte = 2;
-    } else {
-      TXByte = 0;
+    TXByte = 0;
+    if (cycleVal - prevCycleVal < -40) { // if it goes from 50 to 0, counter-clockwise
+      TXByte |= BIT0;
+    } else if (cycleVal - prevCycleVal > 40) { // if it goes from 0 to 50, clock-wise
+      TXByte |= BIT1;
     }
       
     //TXByte = (unsigned char)(ADC10MEM>>2) % 51;

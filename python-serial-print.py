@@ -34,12 +34,14 @@ except:
 ser.flushInput()
 
 # initialize matrix
-playmat = np.zeros((1, 10)) # todo: set these as constants
+HEIGHT = 10
+WIDTH = 10
+playmat = np.zeros((HEIGHT, WIDTH)) # todo: set these as constants
 startX = 4
 startY = 0
 currX = startX
 currY = startY
-playmat[startY, startX] = 1;
+playmat[startY, startX] = 1
 
 def printPlaymat():
     np.set_printoptions(threshold=np.nan)
@@ -51,21 +53,29 @@ def printPlaymat():
     
 def updatePlaymat(xSpinVal):
     global currX, currY
-    playmat[currY, currX] = 0;
-    if xSpinVal == 1:
+    playmat[currY, currX] = 0
+    if xSpinVal == 1 and currX < WIDTH - 1:
         currX += 1
-    elif xSpinVal == 2:
+    elif xSpinVal == 2 and currX > 0:
         currX -= 1
-    playmat[currY, currX] = 1;
+
+    # if ySpinVal == something and currY < LENGTH - 1:
+    #     currY += 1
+    # elif ySpinVal == something and currY > 0:
+    #     currY -= 1
     
+    playmat[currY, currX] = 1
+    
+printPlaymat()
 
 while(1): #loop forever
     data = ser.read(1) # look for a character from serial port - will wait for up to 50ms (specified above in timeout)
     if len(data) > 0: #was there a byte to read?
         TXByte = ord(data)
         #print TXByte
-        updatePlaymat(TXByte)
-        printPlaymat()
+        if TXByte != 0:
+            updatePlaymat(TXByte)
+            printPlaymat()
         #print currX
 
 
