@@ -7,8 +7,10 @@
 #define     SPIN2                 BIT5
 
 unsigned int TXByte;
-int cycleVal;
-int prevCycleVal;
+int cycleValx;
+int prevcycleValx;
+int cycleValy;
+int prevcycleValy;
 
 void main(void)
 {
@@ -17,7 +19,7 @@ void main(void)
   ADC10CTL1 = INCH_4;                       // input A4
   ADC10AE0 |= SPIN1;                         // PA.4 ADC option select
   ADC10AE0 |= SPIN2;
-  P1DIR |= 0x01 ;                            // Set P1.0 to output direction
+  P1DIR |= 0x41 ;                            // Set P1.0 to output direction
   
   P1DIR |= TXD;
   P1OUT |= TXD;
@@ -31,9 +33,11 @@ void main(void)
   UCA0MCTL = UCBRS0; // Modulation UCBRSx = 1
   UCA0CTL1 &= ~UCSWRST; // Initialize USCI state machine
   
-  prevCycleVal = 25;
+  prevcycleValx = 25;
+  prevcycleValy = 25;
 
   while (1) {
+    ADC10CTL1 = INCH_4;
     ADC10CTL0 |= ENC + ADC10SC;             // Sampling and conversion start
     while (ADC10CTL1 &ADC10BUSY);          // ADC10BUSY?
     if (ADC10MEM < 0x2FF)
@@ -41,13 +45,31 @@ void main(void)
     else
       P1OUT |= 0x01;                        // Set P1.0 LED on
     
-    cycleVal = (unsigned char)(ADC10MEM>>2) % 51;
+    cycleValx = (unsigned char)(ADC10MEM>>2) % 51;
     TXByte = 0;
-    if (cycleVal - prevCycleVal < -40) { // if it goes from 50 to 0, counter-clockwise
+    if (cycleValx - prevcycleValx < -40) { // if it goes from 50 to 0, counter-clockwise
       TXByte |= BIT0;
-    } else if (cycleVal - prevCycleVal > 40) { // if it goes from 0 to 50, clock-wise
+    } else if (cycleValx - prevcycleValx > 40) { // if it goes from 0 to 50, clock-wise
       TXByte |= BIT1;
     }
+    prevcycleValx = cycleValx;
+
+    // for (unsigned i = 0xFFFF; i > 0; i--);           // Delay
+
+    ADC10CTL1 = INCH_5;
+    ADC10CTL0 |= ENC + ADC10SC;             // Sampling and conversion start
+    while (ADC10CTL1 &ADC10BUSY);          // ADC10BUSY?
+    if (ADC10MEM < 0x2FF)
+      P1OUT &= ~0x40;                       // Clear P1.6 LED off
+    else
+      P1OUT |= 0x40;                        // Set P1.6 LED on
+    cycleValy = (unsigned char)(ADC10MEM>>2) % 51;
+    if (cycleValy - prevcycleValy < -40) { // if it goes from 50 to 0, counter-clockwise
+      TXByte |= BIT2;
+    } else if (cycleValy - prevcycleValy > 40) { // if it goes from 0 to 50, clock-wise
+      TXByte |= BIT3;
+    }
+    prevcycleValy = cycleValy;
       
     //TXByte = (unsigned char)(ADC10MEM>>2) % 51;
     while (! (IFG2 & UCA0TXIFG)); // wait for TX buffer to be ready for new data
@@ -56,6 +78,6 @@ void main(void)
     unsigned i;
     for (i = 0xFFFF; i > 0; i--);           // Delay
     
-    prevCycleVal = cycleVal;
+    // prevcycleValx = cycleValx;
   }
 }
