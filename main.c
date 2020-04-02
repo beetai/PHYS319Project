@@ -37,6 +37,7 @@ void main(void)
   prevcycleValy = 25;
 
   while (1) {
+    ADC10CTL0 ^= ENC;
     ADC10CTL1 = INCH_4;
     ADC10CTL0 |= ENC + ADC10SC;             // Sampling and conversion start
     while (ADC10CTL1 &ADC10BUSY);          // ADC10BUSY?
@@ -54,8 +55,9 @@ void main(void)
     }
     prevcycleValx = cycleValx;
 
-    // for (unsigned i = 0xFFFF; i > 0; i--);           // Delay
+    for (unsigned i = 0xFFFF; i > 0; i--);           // Delay
 
+    ADC10CTL0 ^= ENC;
     ADC10CTL1 = INCH_5;
     ADC10CTL0 |= ENC + ADC10SC;             // Sampling and conversion start
     while (ADC10CTL1 &ADC10BUSY);          // ADC10BUSY?
