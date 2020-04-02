@@ -38,7 +38,7 @@ HEIGHT = 10
 WIDTH = 10
 playmat = np.zeros((HEIGHT, WIDTH)) # todo: set these as constants
 startX = 4
-startY = 0
+startY = 4
 currX = startX
 currY = startY
 playmat[startY, startX] = 1
@@ -51,19 +51,20 @@ def printPlaymat():
     #        print ele,
     #    print ''
     
-def updatePlaymat(xSpinVal):
+def updatePlaymat(TXByte):
     global currX, currY
     playmat[currY, currX] = 0
-    if xSpinVal == 1 and currX < WIDTH - 1:
-        currX += 1
-    elif xSpinVal == 2 and currX > 0:
-        currX -= 1
 
-    # if ySpinVal == something and currY < LENGTH - 1:
-    #     currY += 1
-    # elif ySpinVal == something and currY > 0:
-    #     currY -= 1
+    if TXByte >> 0 & 1 and currX < WIDTH - 1:
+        currX += 1
+    elif TXByte >> 1 & 1 and currX > 0:
+        currX -= 1
     
+    if TXByte >> 2 & 1 and currY < HEIGHT - 1:
+        currY += 1
+    elif TXByte >> 3 & 1 and currY > 0:
+        currY -= 1
+
     playmat[currY, currX] = 1
     
 printPlaymat()
