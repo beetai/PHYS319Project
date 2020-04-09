@@ -73,9 +73,10 @@ while(1): #loop forever
     data = ser.read(1) # look for a character from serial port - will wait for up to 50ms (specified above in timeout)
     if len(data) > 0: #was there a byte to read?
         TXByte = ord(data)
-        #print TXByte
-        if TXByte != 0:
+        if TXByte & 15 != 0:
             updatePlaymat(TXByte)
+            if TXByte >> 4 & 1:
+                playmat[currY, currX] = 2
             printPlaymat()
         #print currX
 

@@ -72,6 +72,10 @@ void main(void)
       TXByte |= BIT3;
     }
     prevcycleValy = cycleValy;
+
+    if (P1IN & BIT7) {
+      TXByte |= BIT4;
+    }
       
     //TXByte = (unsigned char)(ADC10MEM>>2) % 51;
     while (! (IFG2 & UCA0TXIFG)); // wait for TX buffer to be ready for new data
